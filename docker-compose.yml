@@ -1,0 +1,42 @@
+version: '3.2'
+
+services:
+  zookeeper:
+    image: zookeeper
+    container_name: zookeeper
+    restart: always
+    tty: true
+
+  nimbus:
+    image: storm
+    container_name: nimbus
+    command: storm nimbus
+    depends_on:
+      - zookeeper
+    links:
+      - zookeeper
+    restart: always
+    ports:
+      - 6627:6627
+    tty: true
+
+  supervisor:
+    image: storm
+    container_name: supervisor
+    command: storm supervisor
+    depends_on:
+      - nimbus
+      - zookeeper
+    links:
+      - nimbus
+      - zookeeper
+    restart: always
+    tty: true 
+
+  cassandra:
+    image: cassandra
+    container_name: cassandra
+    ports:
+      - "9042:9042"
+      - "7199:7199"
+    tty: true
